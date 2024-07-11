@@ -1,5 +1,4 @@
-import java.io.IOException;
-import java.net.URISyntaxException;
+import Services.UserServices;
 
 public class Main {
     private static final String BASE_URL = "https://jsonplaceholder.typicode.com";
