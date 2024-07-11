@@ -1,4 +1,4 @@
-import com.fasterxml.jackson.core.JsonProcessingException;
+import Dtos.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -14,34 +14,24 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
 
-public class Tools {
+public class UserServices {
     private static final String BASE_URL = "https://jsonplaceholder.typicode.com";
 
 
-    public static void createNewUser() {
+    public void createNewUser() {
         String currentUri = BASE_URL + "/users";
         ObjectMapper objectMapper = new ObjectMapper();
         HttpClient httpClient = HttpClient.newHttpClient();
+        try {
+            UserDto newUser = new UserDto(
+                    "New Name",
+                    "NewUsername",
+                    "Email",
+                    new AddressDto(),
+                    "555-555-555",
+                    "NewWebsite",
+                    new CompanyDto("CompanyName", "Phrase", "BS"));
 
-        HttpRequest httpUserRequest = null;
-        try {
-            httpUserRequest = HttpRequest.newBuilder(new URI(currentUri))
-                    .GET()
-                    .build();
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-        try {
-            HttpResponse<String> httpResponse = httpClient.send(httpUserRequest, HttpResponse.BodyHandlers.ofString());
-            List<UserDto> responseDtos = objectMapper.readValue(httpResponse.body(),
-                    objectMapper.getTypeFactory().constructCollectionType(List.class, UserDto.class));
-            int maxId = 0;
-            for (int i = 0; i < responseDtos.size(); i++) {
-                if (responseDtos.get(i).id() > maxId) {
-                    maxId = responseDtos.get(i).id();
-                }
-            }
-            UserDto newUser = new UserDto(maxId);
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             String jsonFormat = gson.toJson(newUser);
             try {
@@ -63,38 +53,24 @@ public class Tools {
         }
     }
 
-    public static void updateUserData(int id, String nameToUpdate) throws URISyntaxException, IOException, InterruptedException {
+    public void updateUserData(int id, String nameToUpdate) throws URISyntaxException, IOException, InterruptedException {
         String currentUri = BASE_URL + "/users/" + id;
         ObjectMapper objectMapper = new ObjectMapper();
         HttpClient httpClient = HttpClient.newHttpClient();
-        HttpRequest httpUpdateUserRequest = HttpRequest.newBuilder(new URI(currentUri))
-                .GET()
-                .build();
-        HttpResponse<String> httpResponse = httpClient.send(httpUpdateUserRequest, HttpResponse.BodyHandlers.ofString());
-        System.out.println(httpResponse.statusCode());
-        UserDto responseDto = objectMapper.readValue(httpResponse.body(), UserDto.class);
-        responseDto.setName(nameToUpdate);
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String jsonFormat = gson.toJson(responseDto);
-        System.out.println(jsonFormat);
         HttpRequest updateUserRequest = HttpRequest.newBuilder(new URI(currentUri))
-                .PUT(HttpRequest.BodyPublishers.ofString(jsonFormat))
+                .method("PATCH", HttpRequest.BodyPublishers.ofString("{\"name\": \""+nameToUpdate+"\"}"))
                 .header("Content-type", "application/json")
                 .build();
         HttpResponse<String> updateUserHttpResponse = httpClient.send(updateUserRequest, HttpResponse.BodyHandlers.ofString());
         System.out.println(updateUserHttpResponse.statusCode());
-        ;
-
         if (updateUserHttpResponse.statusCode() == 200) {
             System.out.println("User updated successfully");
         } else {
             System.out.println("Failed to update user: " + updateUserHttpResponse.body());
         }
-
-
     }
 
-    public static void deleteUser(int id) throws URISyntaxException, IOException, InterruptedException {
+    public void deleteUser(int id) throws URISyntaxException, IOException, InterruptedException {
         String currentUri = BASE_URL + "/users/" + id;
         HttpClient httpClient = HttpClient.newHttpClient();
         HttpRequest httpRequest = HttpRequest.newBuilder(new URI(currentUri))
@@ -109,7 +85,7 @@ public class Tools {
         }
     }
 
-    public static void showAllUsers() {
+    public void showAllUsers() {
         String currentUri = BASE_URL + "/users";
         ObjectMapper objectMapper = new ObjectMapper();
         HttpClient httpClient = HttpClient.newHttpClient();
@@ -131,7 +107,7 @@ public class Tools {
         }
     }
 
-    public static void showUserById(int id) {
+    public void showUserById(int id) {
         String currentUri = BASE_URL + "/users/" + id;
         ObjectMapper objectMapper = new ObjectMapper();
         HttpClient httpClient = HttpClient.newHttpClient();
@@ -150,7 +126,7 @@ public class Tools {
         }
     }
 
-    public static void showUserByUsername(String username) {
+    public void showUserByUsername(String username) {
         ObjectMapper objectMapper = new ObjectMapper();
         HttpClient httpClient = HttpClient.newHttpClient();
         try {
@@ -161,7 +137,7 @@ public class Tools {
             List<UserDto> responseDtos = objectMapper.readValue(httpResponse.body(),
                     objectMapper.getTypeFactory().constructCollectionType(List.class, UserDto.class));
             for (int i = 0; i < responseDtos.size(); i++) {
-                if (responseDtos.get(i).username.equals(username)) {
+                if (responseDtos.get(i).username().equals(username)) {
                     System.out.println(responseDtos.get(i));
                 }
             }
@@ -172,16 +148,12 @@ public class Tools {
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
-
-
     }
 
-    public static void writeLastUsersPostComments(int userId) {
-
+    public void writeLastUsersPostComments(int userId) {
         ObjectMapper objectMapper = new ObjectMapper();
         HttpClient httpClient = HttpClient.newHttpClient();
         try {
-
             //смотрим посты по юзер айди
             HttpRequest httpRequest = HttpRequest.newBuilder(new URI(BASE_URL + "/users/" + userId + "/posts"))
                     .GET()
@@ -201,7 +173,6 @@ public class Tools {
             List<CommentsDto> commentsDtos = objectMapper.readValue(httpResponse.body(),
                     objectMapper.getTypeFactory().constructCollectionType(List.class, CommentsDto.class));
 
-
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             String jsonFormat = gson.toJson(commentsDtos);
 
@@ -213,7 +184,6 @@ public class Tools {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (InterruptedException e) {
@@ -223,16 +193,14 @@ public class Tools {
         }
     }
 
-    public static void showOpenTasks(int userId) {
+    public void showOpenTasks(int userId) {
         try {
             String currentUri = BASE_URL + "/users/" + userId + "/todos";
             ObjectMapper objectMapper = new ObjectMapper();
             HttpClient httpClient = HttpClient.newHttpClient();
-
             HttpRequest httpRequest = HttpRequest.newBuilder(new URI(currentUri))
                     .GET()
                     .build();
-
             HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
             List<TodoDto> todoDtos = objectMapper.readValue(httpResponse.body(),
                     objectMapper.getTypeFactory().constructCollectionType(List.class, TodoDto.class));

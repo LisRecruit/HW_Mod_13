@@ -1,3 +1,5 @@
+package Dtos;
+
 public record PostsDto(
         int userId,
         int id,

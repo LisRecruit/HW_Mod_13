@@ -1,3 +1,5 @@
+package Dtos;
+
 public class AddressDto{
         String street;
         String suite;

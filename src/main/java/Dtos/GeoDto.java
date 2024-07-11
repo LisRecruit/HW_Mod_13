@@ -1,3 +1,5 @@
+package Dtos;
+
 public class GeoDto{
         String lat;
         String lng;

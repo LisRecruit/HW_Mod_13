@@ -1,3 +1,5 @@
+package Dtos;
+
 public record CommentsDto(
         int postId,
         int id,
