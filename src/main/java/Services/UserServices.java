@@ -16,12 +16,13 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
 
+
 public class UserServices {
-    private static final String BASE_URL = "https://jsonplaceholder.typicode.com";
+
 
 
     public void createNewUser() {
-        String currentUri = BASE_URL + "/users";
+        String currentUri = Constants.BASE_URL + "/users";
         ObjectMapper objectMapper = new ObjectMapper();
         HttpClient httpClient = HttpClient.newHttpClient();
         try {
@@ -56,7 +57,7 @@ public class UserServices {
     }
 
     public void updateUserData(int id, String nameToUpdate) throws URISyntaxException, IOException, InterruptedException {
-        String currentUri = BASE_URL + "/users/" + id;
+        String currentUri = Constants.BASE_URL + "/users/" + id;
         ObjectMapper objectMapper = new ObjectMapper();
         HttpClient httpClient = HttpClient.newHttpClient();
         HttpRequest updateUserRequest = HttpRequest.newBuilder(new URI(currentUri))
@@ -73,7 +74,7 @@ public class UserServices {
     }
 
     public void deleteUser(int id) throws URISyntaxException, IOException, InterruptedException {
-        String currentUri = BASE_URL + "/users/" + id;
+        String currentUri = Constants.BASE_URL + "/users/" + id;
         HttpClient httpClient = HttpClient.newHttpClient();
         HttpRequest httpRequest = HttpRequest.newBuilder(new URI(currentUri))
                 .DELETE()
@@ -88,7 +89,7 @@ public class UserServices {
     }
 
     public void showAllUsers() {
-        String currentUri = BASE_URL + "/users";
+        String currentUri = Constants.BASE_URL + "/users";
         ObjectMapper objectMapper = new ObjectMapper();
         HttpClient httpClient = HttpClient.newHttpClient();
 
@@ -110,7 +111,7 @@ public class UserServices {
     }
 
     public void showUserById(int id) {
-        String currentUri = BASE_URL + "/users/" + id;
+        String currentUri = Constants.BASE_URL + "/users/" + id;
         ObjectMapper objectMapper = new ObjectMapper();
         HttpClient httpClient = HttpClient.newHttpClient();
         try {
@@ -132,7 +133,7 @@ public class UserServices {
         ObjectMapper objectMapper = new ObjectMapper();
         HttpClient httpClient = HttpClient.newHttpClient();
         try {
-            HttpRequest httpRequest = HttpRequest.newBuilder(new URI(BASE_URL + "/users"))
+            HttpRequest httpRequest = HttpRequest.newBuilder(new URI(Constants.BASE_URL + "/users"))
                     .GET()
                     .build();
             HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
@@ -157,7 +158,7 @@ public class UserServices {
         HttpClient httpClient = HttpClient.newHttpClient();
         try {
             //смотрим посты по юзер айди
-            HttpRequest httpRequest = HttpRequest.newBuilder(new URI(BASE_URL + "/users/" + userId + "/posts"))
+            HttpRequest httpRequest = HttpRequest.newBuilder(new URI(Constants.BASE_URL + "/users/" + userId + "/posts"))
                     .GET()
                     .build();
             HttpResponse<String> httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
@@ -166,7 +167,7 @@ public class UserServices {
 
             //находим нужный пост
             int currentPost = responseDtos.get(responseDtos.size() - 1).id();
-            String currentUri = BASE_URL + "/posts/" + currentPost + "/comments";
+            String currentUri = Constants.BASE_URL + "/posts/" + currentPost + "/comments";
 
             httpRequest = HttpRequest.newBuilder(new URI(currentUri))
                     .GET()
@@ -197,7 +198,7 @@ public class UserServices {
 
     public void showOpenTasks(int userId) {
         try {
-            String currentUri = BASE_URL + "/users/" + userId + "/todos";
+            String currentUri = Constants.BASE_URL + "/users/" + userId + "/todos";
             ObjectMapper objectMapper = new ObjectMapper();
             HttpClient httpClient = HttpClient.newHttpClient();
             HttpRequest httpRequest = HttpRequest.newBuilder(new URI(currentUri))
